@@ -24,15 +24,27 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private static final String TAG = "bluetooth2";
 
-    Button start, stop, calc, next;
+    Button getInit, getFinal, calc, next;
     //reset, logData, showLog;
     Handler h;
 
 //    ListView listView;
 
-    boolean isStopPressed = false;
-    private TextView a, b, c, d, tradA, tradB, tradC, tradD;
-    //, , sliA, sliB, sliC, sliD, sliRat;
+    boolean isInitPressed, isFinalPressed;
+
+
+    Button getDiffB;
+    //Initial Values;
+    private TextView a, b, c, d;
+
+    //Final Values
+    private TextView fA, fB, fC, fD;
+
+    //Difference
+    private TextView dA, dB, dC, dD;
+
+    //Radii
+    private TextView tradA, tradB, tradC, tradD;
 
     private Double radA = 0.0, radB = 0.0, radC = 0.0, radD = 0.0;
     private EditText distance;
@@ -49,14 +61,15 @@ public class MainActivity extends Activity {
 
     // MAC-address of Bluetooth module (you must edit this line)
     private static String address = "98:D3:32:30:A3:46";
-    private DBHelper myDB;
-    String value[] = new String[4];
-    Double val[] = new Double[4];
-    char wheel = ' ';
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        btAdapter = BluetoothAdapter.getDefaultAdapter();        // get Bluetooth adapter
+        checkBTState();
+
+        isFinalPressed = false;
+        isInitPressed = false;
 
         setContentView(R.layout.activity_main);
 
@@ -64,7 +77,7 @@ public class MainActivity extends Activity {
         log.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this,LogActivity.class);
+                Intent i = new Intent(MainActivity.this, LogActivity.class);
                 startActivity(i);
             }
         });
@@ -72,6 +85,16 @@ public class MainActivity extends Activity {
 
         final Intent i = new Intent(this, slipPerActivity.class);
         next = (Button) findViewById(R.id.next);
+        getDiffB = (Button) findViewById(R.id.diff);
+        getDiffB.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                calDiff();
+            }
+        });
+
+
+
         next.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,20 +104,10 @@ public class MainActivity extends Activity {
                 b.putDouble("CRAD", radC);
                 b.putDouble("DRAD", radD);
                 i.putExtras(b);
-                h.removeCallbacks(mConnectedThread);
-//                try {
-//                    mConnectedThread.join();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
                 startActivity(i);
             }
         });
 
-        for (int J = 0; J < 4; J++) {
-            value[J] = "";
-            val[J] = 0.00;
-        }
 
 //        logData = (Button) findViewById(R.id.log);
 //        showLog = (Button) findViewById(R.id.showL);
@@ -102,10 +115,24 @@ public class MainActivity extends Activity {
 //        reset = (Button) findViewById(R.id.reset);
         calc = (Button) findViewById(R.id.calc);
         distance = (EditText) findViewById(R.id.dist);
+
+        //Init Val
         a = (TextView) findViewById(R.id.A);
         b = (TextView) findViewById(R.id.B);
         c = (TextView) findViewById(R.id.C);
         d = (TextView) findViewById(R.id.D);
+        //Final Val
+        fA = (TextView) findViewById(R.id.fA);
+        fB = (TextView) findViewById(R.id.fB);
+        fC = (TextView) findViewById(R.id.fC);
+        fD = (TextView) findViewById(R.id.fD);
+        //Difference
+        dA = (TextView) findViewById(R.id.dA);
+        dB = (TextView) findViewById(R.id.dB);
+        dC = (TextView) findViewById(R.id.dC);
+        dD = (TextView) findViewById(R.id.dD);
+
+
         tradA = (TextView) findViewById(R.id.radA);
         tradB = (TextView) findViewById(R.id.radB);
         tradC = (TextView) findViewById(R.id.radC);
@@ -128,8 +155,8 @@ public class MainActivity extends Activity {
         //        listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
         //        listView.setAdapter(listAdapter);
 
-        start = (Button) findViewById(R.id.start);
-        stop = (Button) findViewById(R.id.stop);
+        getInit = (Button) findViewById(R.id.getInit);
+        getFinal = (Button) findViewById(R.id.getFin);
 
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -142,13 +169,18 @@ public class MainActivity extends Activity {
                         if (endOfLineIndex > 0) {                                            // if end-of-line,
                             String sbprint = sb.substring(0, endOfLineIndex);                // extract string
                             sb.delete(0, sb.length());
-                            Toast.makeText(MainActivity.this,sbprint,Toast.LENGTH_SHORT).show();
-                            // and clear
-//                            list.add("Data from Arduino: " + sbprint);
-                                parseData(sbprint);
-//                            listAdapter.notifyDataSetChanged();
-                            stop.setEnabled(true);
-                            start.setEnabled(true);
+                            Toast.makeText(MainActivity.this, sbprint, Toast.LENGTH_SHORT).show();
+                            int m = parseWhat();
+                            switch (m) {
+                                case 0:
+                                    if(!checkStat(a,b,c,d))
+                                        parseData(sbprint, a, b, c, d);
+                                    break;
+                                case 1:
+                                    if(!checkStat(fA,fB,fC,fD))
+                                        parseData(sbprint, fA, fB, fC, fD);
+                                    break;
+                            }
                         }
                         //Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
                         break;
@@ -158,9 +190,6 @@ public class MainActivity extends Activity {
 
         };
 
-        btAdapter = BluetoothAdapter.getDefaultAdapter();        // get Bluetooth adapter
-        checkBTState();
-
 
         calc.setOnClickListener(new OnClickListener() {
             @Override
@@ -169,33 +198,28 @@ public class MainActivity extends Activity {
             }
         });
 
-        start.setOnClickListener(new OnClickListener() {
+        getInit.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                start.setEnabled(false);
-                mConnectedThread = new ConnectedThread(btSocket);
-                mConnectedThread.start();
-                distance.setVisibility(View.GONE);
-                calc.setVisibility(View.GONE);
-                next.setVisibility(View.GONE);
-                tradA.setVisibility(View.GONE);
-                tradB.setVisibility(View.GONE);
-                tradC.setVisibility(View.GONE);
-                tradD.setVisibility(View.GONE);
-                isStopPressed = false;
-                stop.setEnabled(true);
-//                listView.setAdapter(listAdapter);
-                mConnectedThread.write("1");    // Send "1" via Bluetooth
-                //Toast.makeText(getBaseContext(), "Turn on LED", Toast.LENGTH_SHORT).show();
+                isInitPressed = true;
+                getInit.setEnabled(false);
+                getFinal.setEnabled(true);
+                isFinalPressed = false;
+
+//                while(checkStat(a,b,c,d)==false){
+//                    mConnectedThread.read();
+//                }
+//                mConnectedThread.read();
             }
         });
 
-        stop.setOnClickListener(new OnClickListener() {
+        getFinal.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                stop.setEnabled(false);
-                start.setEnabled(true);
-                isStopPressed = true;
-                distance.setVisibility(View.VISIBLE);
-                calc.setVisibility(View.VISIBLE);
+                isFinalPressed = true;
+                getFinal.setEnabled(false);
+                getInit.setEnabled(true);
+                isInitPressed = false;
+//                distance.setVisibility(View.VISIBLE);
+//                calc.setVisibility(View.VISIBLE);
 //                mConnectedThread.write("0");    // Send "0" via Bluetooth
 //                try {
 //                    mConnectedThread.join();
@@ -211,6 +235,7 @@ public class MainActivity extends Activity {
         });
     }
 
+
     private double calRad(int dist, double turns) {
         double deno = 2 * 3.14 * turns;
         double numo = dist;
@@ -219,6 +244,17 @@ public class MainActivity extends Activity {
 
     }
 
+
+    private int parseWhat() {
+        if (isInitPressed)
+            return 0;
+
+        else if (isFinalPressed)
+            return 1;
+
+        else
+            return -1;
+    }
     //
 
 
@@ -245,10 +281,10 @@ public class MainActivity extends Activity {
 //    }
 
     private void calcVal() {
-        String aVal = a.getText().toString();
-        String bVal = b.getText().toString();
-        String cVal = c.getText().toString();
-        String dVal = d.getText().toString();
+        String aVal = dA.getText().toString();
+        String bVal = dB.getText().toString();
+        String cVal = dC.getText().toString();
+        String dVal = dD.getText().toString();
         Double A = 0.0, B = 0.0, C = 0.0, D = 0.0;
         if (!aVal.isEmpty())
             A = Double.parseDouble(aVal);
@@ -302,11 +338,11 @@ public class MainActivity extends Activity {
 //            sliRat.setText("Slip Ratio : " + slipRat.toString());
 //        }
 
-        next.setVisibility(View.VISIBLE);
-        tradA.setVisibility(View.VISIBLE);
-        tradB.setVisibility(View.VISIBLE);
-        tradC.setVisibility(View.VISIBLE);
-        tradD.setVisibility(View.VISIBLE);
+//        next.setVisibility(View.VISIBLE);
+//        tradA.setVisibility(View.VISIBLE);
+//        tradB.setVisibility(View.VISIBLE);
+//        tradC.setVisibility(View.VISIBLE);
+//        tradD.setVisibility(View.VISIBLE);
 //        sliA.setVisibility(View.VISIBLE);
 //        sliB.setVisibility(View.VISIBLE);
 //        sliC.setVisibility(View.VISIBLE);
@@ -366,9 +402,9 @@ public class MainActivity extends Activity {
 
         // Create a data stream so we can talk to server.
         Log.d(TAG, "...Create Socket...");
-//
-//        mConnectedThread = new ConnectedThread(btSocket);
-//        mConnectedThread.start();
+
+        mConnectedThread = new ConnectedThread(btSocket);
+        mConnectedThread.start();
     }
 
     @Override
@@ -409,12 +445,11 @@ public class MainActivity extends Activity {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
+
         public ConnectedThread(BluetoothSocket socket) {
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
-            // Get the input and output streams, using temp objects because
-            // member streams are final
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
@@ -441,6 +476,7 @@ public class MainActivity extends Activity {
             }
         }
 
+
         /* Call this from the main activity to send data to the remote device */
         public void write(String message) {
             Log.d(TAG, "...Data to send: " + message + "...");
@@ -453,58 +489,103 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void parseData(String s) {
+
+    private void parseData(String s, TextView aA, TextView bB, TextView cC, TextView dD) {
+        String value = "";
         int i = 0;
-
+        char temp;
         if (s.charAt(0) == '<') {
-            if (s.charAt(1) == 'A' || s.charAt(1) == 'B' || s.charAt(1) == 'C' || s.charAt(1) == 'D') {
-                switch (s.charAt(1)) {
-                    case 'A':
-                        wheel = 'A';
-                        i = 0;
-                        break;
-                    case 'B':
-                        wheel = 'B';
-                        i = 1;
-                        break;
-                    case 'C':
-                        wheel = 'C';
-                        i = 2;
-                        break;
-                    case 'D':
-                        wheel = 'D';
-                        i = 3;
-                        break;
-                }
-
-                for (int j = 2; s.charAt(j) != '>'; j++)
-                    if (Character.toString(s.charAt(j)) != null)
-                        value[i] += Character.toString(s.charAt(j));
+            temp = s.charAt(1);
+            switch (temp) {
+                case 'A':
+                    i = 0;
+                    break;
+                case 'B':
+                    i = 1;
+                    break;
+                case 'C':
+                    i = 2;
+                    break;
+                case 'D':
+                    i = 3;
+                    break;
             }
 
-            try {
-                val[i] = Double.parseDouble(value[i]);
-            } catch (Exception e) {
-
-            }
+            for (int j = 2; s.charAt(j) != '>'; j++)
+                value += Character.toString(s.charAt(j));
         }
-        String W = Character.toString(wheel);
-        System.out.println(W + val[i]);
+
 
         switch (i) {
             case 0:
-                a.setText(String.valueOf(val[i]));
+                aA.setText(value);
                 break;
             case 1:
-                b.setText(String.valueOf(val[i]));
+                bB.setText(value);
                 break;
             case 2:
-                c.setText(String.valueOf(val[i]));
+                cC.setText(value);
                 break;
             case 3:
-                d.setText(String.valueOf(val[i]));
+                dD.setText(value);
                 break;
         }
     }
 
+    private boolean checkStat(TextView one, TextView two, TextView three, TextView four) {
+        String curA, curB, curC, curD;
+        curA = one.getText().toString();
+        curB = two.getText().toString();
+        curC = three.getText().toString();
+        curD = four.getText().toString();
+        if (!curA.isEmpty() && !curB.isEmpty() && !curC.isEmpty() && !curD.isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void calDiff() {
+        double iA, iB, iC, iD, fiA, fiB, fiC, fiD, diffA, diffB, diffC, diffD;
+        iA = Double.parseDouble(a.getText().toString());
+        iB = Double.parseDouble(b.getText().toString());
+        iC = Double.parseDouble(c.getText().toString());
+        iD = Double.parseDouble(d.getText().toString());
+
+        fiA = Double.parseDouble(fA.getText().toString());
+        fiB = Double.parseDouble(fB.getText().toString());
+        fiC = Double.parseDouble(fC.getText().toString());
+        fiD = Double.parseDouble(fD.getText().toString());
+
+        diffA = fiA - iA;
+        diffB = fiB - iB;
+        diffC = fiC - iC;
+        diffD = fiD - iD;
+
+        dA.setText(String.valueOf(diffA));
+        dB.setText(String.valueOf(diffB));
+        dC.setText(String.valueOf(diffC));
+        dD.setText(String.valueOf(diffD));
+    }
+
+
+    @Override
+    public void onDestroy() {
+        if (mConnectedThread!=null) {
+            mConnectedThread.interrupt(); // request to terminate thread in regular way
+            try{
+                mConnectedThread.join(500); // wait until thread ends or timeout after 0.5 second
+            }
+            catch (InterruptedException e){
+
+            }
+
+            if (mConnectedThread.isAlive()) {
+                // this is needed only when something is wrong with thread, for example hangs in ininitive loop or waits to long for lock to be released by other thread.
+                Log.e(TAG, "Serious problem with thread!");
+                mConnectedThread.stop();
+            }
+        }
+        super.onDestroy();
+    }
 }

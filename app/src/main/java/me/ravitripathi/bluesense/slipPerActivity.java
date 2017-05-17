@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Handler;
-import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,36 +23,52 @@ import java.util.UUID;
 
 public class slipPerActivity extends AppCompatActivity {
 
-    private Boolean isStopPressed = false;
+    Button getInit, getFinal;
+    Handler h;
 
-    private ScrollView scrollView;
+    boolean isInitPressed, isFinalPressed;
+    private ConnectedThread mConnectedThread;
 
+    Button getDiffB;
+    //Initial Values;
+    private TextView a, b, c, d;
+
+    //Final Values
+    private TextView fA, fB, fC, fD;
+
+    //Difference
+    private TextView dA, dB, dC, dD;
+
+    private EditText distance;
+
+    final int RECIEVE_MESSAGE = 1;        // Status  for Handler
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
     private StringBuilder sb = new StringBuilder();
 
+    // SPP UUID service
+    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    // MAC-address of Bluetooth module (you must edit this line)
+    private static String address = "98:D3:32:30:A3:46";
+
+
+////////////////////////////////////////////////////////////////////////////
+
+
+    private ScrollView scrollView;
     private DBHelper myDB;
 
 
     String TAG = "slipPerActivity";
 
-    TextView a, b, c, d, TslipA, TslipB, TslipC, TslipD, TsliRat;
-
-    final int RECIEVE_MESSAGE = 1;        // Status  for Handler
-    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-
-    private ConnectedThread mConnectedThread;
-    Handler h;
+    TextView TslipA, TslipB, TslipC, TslipD, TsliRat, TsliRat2;
 
     Double radA, radB, radC, radD;
-    Double slipA=0.0, slipB=0.0, slipC=0.0, slipD=0.0;
-    Double slipRat = 0.0;
+    Double slipA = 0.0, slipB = 0.0, slipC = 0.0, slipD = 0.0;
+    Double slipRat = 0.0, slipRat2 = 0.0 ;
 
-    EditText distance;
     Button calc, log;
-
-    private static String address = "98:D3:32:30:A3:46";
-    Button start, stop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,41 +78,66 @@ public class slipPerActivity extends AppCompatActivity {
         Bundle bun = i.getExtras();
 
         myDB = new DBHelper(this);
+
+        getInit = (Button) findViewById(R.id.getInit);
+        getFinal = (Button) findViewById(R.id.getFin);
+
+
         radA = bun.getDouble("ARAD");
         radB = bun.getDouble("BRAD");
         radC = bun.getDouble("CRAD");
         radD = bun.getDouble("DRAD");
 
-        TextView radiusA = (TextView) findViewById(R.id.rA);
-        TextView radiusB = (TextView) findViewById(R.id.rB);
-        TextView radiusC = (TextView) findViewById(R.id.rC);
-        TextView radiusD = (TextView) findViewById(R.id.rD);
+        btAdapter = BluetoothAdapter.getDefaultAdapter();        // get Bluetooth adapter
+        checkBTState();
 
-        a = (TextView) findViewById(R.id.As);
-        b = (TextView) findViewById(R.id.Bs);
-        c = (TextView) findViewById(R.id.Cs);
-        d = (TextView) findViewById(R.id.Ds);
+        isFinalPressed = false;
+        isInitPressed = false;
+
+
+        getDiffB = (Button) findViewById(R.id.diff);
+        getDiffB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                calDiff();
+            }
+        });
+
+
+//        logData = (Button) findViewById(R.id.log);
+//        showLog = (Button) findViewById(R.id.showL);
+//        myDB = new DBHelper(this);
+//        reset = (Button) findViewById(R.id.reset);
+        calc = (Button) findViewById(R.id.calc);
+        distance = (EditText) findViewById(R.id.dist);
+
+        //Init Val
+        a = (TextView) findViewById(R.id.A);
+        b = (TextView) findViewById(R.id.B);
+        c = (TextView) findViewById(R.id.C);
+        d = (TextView) findViewById(R.id.D);
+        //Final Val
+        fA = (TextView) findViewById(R.id.fA);
+        fB = (TextView) findViewById(R.id.fB);
+        fC = (TextView) findViewById(R.id.fC);
+        fD = (TextView) findViewById(R.id.fD);
+        //Difference
+        dA = (TextView) findViewById(R.id.dA);
+        dB = (TextView) findViewById(R.id.dB);
+        dC = (TextView) findViewById(R.id.dC);
+        dD = (TextView) findViewById(R.id.dD);
+
 
         TslipA = (TextView) findViewById(R.id.slipA);
         TslipB = (TextView) findViewById(R.id.slipB);
         TslipC = (TextView) findViewById(R.id.slipC);
         TslipD = (TextView) findViewById(R.id.slipD);
         TsliRat = (TextView) findViewById(R.id.SLIPRAT);
+        TsliRat2 = (TextView) findViewById(R.id.SLIPRAT2);
 
         log = (Button) findViewById(R.id.log);
         scrollView = (ScrollView) findViewById(R.id.scroll);
 
-
-        distance = (EditText) findViewById(R.id.dist);
-        calc = (Button) findViewById(R.id.calc);
-
-        radiusA.setText("A Ref Radius : " + radA.toString());
-        radiusB.setText("B Ref Radius : " + radB.toString());
-        radiusC.setText("C Ref Radius : " + radC.toString());
-        radiusD.setText("D Ref Radius : " + radD.toString());
-
-        start = (Button) findViewById(R.id.start);                    // button LED ON
-        stop = (Button) findViewById(R.id.stop);                // button LED OFF
 
         log.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,13 +159,18 @@ public class slipPerActivity extends AppCompatActivity {
                         if (endOfLineIndex > 0) {                                            // if end-of-line,
                             String sbprint = sb.substring(0, endOfLineIndex);                // extract string
                             sb.delete(0, sb.length());
-                            Toast.makeText(slipPerActivity.this,sbprint,Toast.LENGTH_SHORT).show();
-                            // and clear
-//                            list.add("Data from Arduino: " + sbprint);
-                                parseData(sbprint);
-//                            listAdapter.notifyDataSetChanged();
-                            stop.setEnabled(true);
-                            start.setEnabled(true);
+                            Toast.makeText(slipPerActivity.this, sbprint, Toast.LENGTH_SHORT).show();
+                            int m = parseWhat();
+                            switch (m) {
+                                case 0:
+                                    if (!checkStat(a, b, c, d))
+                                        parseData(sbprint, a, b, c, d);
+                                    break;
+                                case 1:
+                                    if (!checkStat(fA, fB, fC, fD))
+                                        parseData(sbprint, fA, fB, fC, fD);
+                                    break;
+                            }
                         }
                         //Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
                         break;
@@ -143,30 +188,35 @@ public class slipPerActivity extends AppCompatActivity {
             }
         });
 
-        start.setOnClickListener(new View.OnClickListener() {
+        getInit.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                start.setEnabled(false);
-                mConnectedThread = new ConnectedThread(btSocket);
-                mConnectedThread.start();
-                scrollView.setVisibility(View.VISIBLE);
-                isStopPressed = false;
-                stop.setEnabled(true);
+                isInitPressed = true;
+                getInit.setEnabled(false);
+                getFinal.setEnabled(true);
+                isFinalPressed = false;
             }
         });
 
-        stop.setOnClickListener(new View.OnClickListener() {
+        getFinal.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                stop.setEnabled(false);
-                start.setEnabled(true);
-                isStopPressed = true;
-
+                isFinalPressed = true;
+                getFinal.setEnabled(false);
+                getInit.setEnabled(true);
+                isInitPressed = false;
             }
         });
 
-        btAdapter = BluetoothAdapter.getDefaultAdapter();        // get Bluetooth adapter
-        checkBTState();
+    }
 
+    private int parseWhat() {
+        if (isInitPressed)
+            return 0;
 
+        else if (isFinalPressed)
+            return 1;
+
+        else
+            return -1;
     }
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
@@ -219,9 +269,9 @@ public class slipPerActivity extends AppCompatActivity {
 
         // Create a data stream so we can talk to server.
         Log.d(TAG, "...Create Socket...");
-//
-//        mConnectedThread = new ConnectedThread(btSocket);
-//        mConnectedThread.start();
+
+        mConnectedThread = new ConnectedThread(btSocket);
+        mConnectedThread.start();
     }
 
     @Override
@@ -262,12 +312,11 @@ public class slipPerActivity extends AppCompatActivity {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
+
         public ConnectedThread(BluetoothSocket socket) {
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
-            // Get the input and output streams, using temp objects because
-            // member streams are final
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
@@ -294,58 +343,88 @@ public class slipPerActivity extends AppCompatActivity {
             }
         }
 
+
     }
 
-    private void parseData(String s) {
 
-        int i = 0;
+    private void parseData(String s, TextView aA, TextView bB, TextView cC, TextView dD) {
         String value = "";
-        Double val = 0.0;
+        int i = 0;
+        char temp;
         if (s.charAt(0) == '<') {
-            if (s.charAt(1) == 'A' || s.charAt(1) == 'B' || s.charAt(1) == 'C' || s.charAt(1) == 'D') {
-                switch (s.charAt(1)) {
-                    case 'A':
-                        i = 0;
-                        break;
-                    case 'B':
-                        i = 1;
-                        break;
-                    case 'C':
-                        i = 2;
-                        break;
-                    case 'D':
-                        i = 3;
-                        break;
-                }
-
-                for (int j = 2; s.charAt(j) != '>'; j++)
-                    if (Character.toString(s.charAt(j)) != null)
-                        value += Character.toString(s.charAt(j));
+            temp = s.charAt(1);
+            switch (temp) {
+                case 'A':
+                    i = 0;
+                    break;
+                case 'B':
+                    i = 1;
+                    break;
+                case 'C':
+                    i = 2;
+                    break;
+                case 'D':
+                    i = 3;
+                    break;
             }
 
-            try {
-                val = Double.parseDouble(value);
-            } catch (Exception e) {
-
-            }
+            for (int j = 2; s.charAt(j) != '>'; j++)
+                value += Character.toString(s.charAt(j));
         }
 
 
         switch (i) {
             case 0:
-                a.setText(value);
+                aA.setText(value);
                 break;
             case 1:
-                b.setText(value);
+                bB.setText(value);
                 break;
             case 2:
-                c.setText(value);
+                cC.setText(value);
                 break;
             case 3:
-                d.setText(value);
+                dD.setText(value);
                 break;
         }
     }
+
+    private boolean checkStat(TextView one, TextView two, TextView three, TextView four) {
+        String curA, curB, curC, curD;
+        curA = one.getText().toString();
+        curB = two.getText().toString();
+        curC = three.getText().toString();
+        curD = four.getText().toString();
+        if (!curA.isEmpty() && !curB.isEmpty() && !curC.isEmpty() && !curD.isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void calDiff() {
+        double iA, iB, iC, iD, fiA, fiB, fiC, fiD, diffA, diffB, diffC, diffD;
+        iA = Double.parseDouble(a.getText().toString());
+        iB = Double.parseDouble(b.getText().toString());
+        iC = Double.parseDouble(c.getText().toString());
+        iD = Double.parseDouble(d.getText().toString());
+
+        fiA = Double.parseDouble(fA.getText().toString());
+        fiB = Double.parseDouble(fB.getText().toString());
+        fiC = Double.parseDouble(fC.getText().toString());
+        fiD = Double.parseDouble(fD.getText().toString());
+
+        diffA = fiA - iA;
+        diffB = fiB - iB;
+        diffC = fiC - iC;
+        diffD = fiD - iD;
+
+        dA.setText(String.valueOf(diffA));
+        dB.setText(String.valueOf(diffB));
+        dC.setText(String.valueOf(diffC));
+        dD.setText(String.valueOf(diffD));
+    }
+
 
     private double slipPer(int dist, double rad, double turns) {
 
@@ -357,56 +436,57 @@ public class slipPerActivity extends AppCompatActivity {
     }
 
     private void calnSet() {
-        Double Aturns=0.0, Bturns=0.0, Cturns=0.0, Dturns=0.0;
+        Double Aturns = 0.0, Bturns = 0.0, Cturns = 0.0, Dturns = 0.0;
         int dist = 0;
         try {
-            String aW = a.getText().toString();
-            String bW = b.getText().toString();
-            String cW = c.getText().toString();
-            String dW = d.getText().toString();
+            String aW = dA.getText().toString();
+            String bW = dB.getText().toString();
+            String cW = dC.getText().toString();
+            String dW = dD.getText().toString();
             String dis = distance.getText().toString();
 
-            if(!aW.isEmpty())
+            if (!aW.isEmpty())
                 Aturns = Double.parseDouble(aW);
-            if(!bW.isEmpty())
+            if (!bW.isEmpty())
                 Bturns = Double.parseDouble(bW);
-            if(!cW.isEmpty())
+            if (!cW.isEmpty())
                 Cturns = Double.parseDouble(cW);
-            if(!dW.isEmpty())
+            if (!dW.isEmpty())
                 Dturns = Double.parseDouble(dW);
 
-            if(!dis.isEmpty())
+            if (!dis.isEmpty())
                 dist = Integer.parseInt(dis);
 
             slipA = slipPer(dist, radA, Aturns);
             slipB = slipPer(dist, radB, Bturns);
             slipC = slipPer(dist, radC, Cturns);
             slipD = slipPer(dist, radD, Dturns);
-            TslipA.setText("Slip% for A: "+slipA.toString());
-            TslipB.setText("Slip% for B: "+slipB.toString());
-            TslipC.setText("Slip% for C: "+slipC.toString());
-            TslipD.setText("Slip% for D: "+slipD.toString());
+            TslipA.setText("Slip% for A: " + slipA.toString());
+            TslipB.setText("Slip% for B: " + slipB.toString());
+            TslipC.setText("Slip% for C: " + slipC.toString());
+            TslipD.setText("Slip% for D: " + slipD.toString());
 
+            //1:a, 2:c
             //radA=R1, radD=R2, Aturns = N1, Dturns = N2
-            if(radA!=0&&radD!=0&&Aturns!=0){
-                Double r1N1 = radA*Aturns;
-                Double r2N2 = radD*Dturns;
-                slipRat = (r1N1-r2N2)/r1N1;
-                TsliRat.setText("Slip Ratio: "+slipRat.toString());
+            if (radA != 0 && radC != 0 && Aturns != 0) {
+                Double r1N1 = radA * Aturns;
+                Double r2N2 = radC * Cturns;
+                slipRat = (r1N1 - r2N2) / r1N1;
+                TsliRat.setText("Slip Ratio (a,c) :" + slipRat.toString());
+            }
+
+            //1:b, 2:d
+            if (radB != 0 && radD != 0 && Bturns != 0) {
+                Double r1N1 = radB * Bturns;
+                Double r2N2 = radD * Dturns;
+                slipRat2 = (r1N1 - r2N2) / r1N1;
+                TsliRat2.setText("Slip Ratio (b,d) :" + slipRat2.toString());
             }
 
 
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Either the provided distance or number of turns is in incorrect format", Toast.LENGTH_LONG).show();
         }
-        catch (NumberFormatException e){
-            Toast.makeText(this, "Either the provided distance or number of turns is in incorrect format",Toast.LENGTH_LONG).show();
-        }
-
-        TslipA.setVisibility(View.VISIBLE);
-        TslipB.setVisibility(View.VISIBLE);
-        TslipC.setVisibility(View.VISIBLE);
-        TslipD.setVisibility(View.VISIBLE);
-        TsliRat.setVisibility(View.VISIBLE);
-        log.setVisibility(View.VISIBLE);
+        scrollView.setVisibility(View.VISIBLE);
     }
-
 }

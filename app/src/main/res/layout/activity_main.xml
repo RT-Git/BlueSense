@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,264 +7,209 @@
 
 
     <Button
-        android:id="@+id/start"
+        android:id="@+id/getInit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/stop"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_alignParentTop="true"
+        android:text="gET iNIT vALUE" />
 
     <Button
-        android:id="@+id/stop"
+        android:id="@+id/getFin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stop"
-        app:layout_constraintLeft_toRightOf="@+id/start"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_alignBaseline="@id/getInit"
+        android:layout_toEndOf="@id/getInit"
+        android:layout_toRightOf="@id/getInit"
+        android:text="Get Final Value" />
 
-
-    <!--<Button-->
-    <!--android:id="@+id/reset"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginRight="8dp"-->
-    <!--android:layout_marginTop="8dp"-->
-    <!--android:text="Reset"-->
-    <!--app:layout_constraintLeft_toRightOf="@+id/stop"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-    <!--android:layout_marginEnd="8dp" />-->
+    <Button
+        android:id="@+id/diff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/getFin"
+        android:layout_toEndOf="@id/getFin"
+        android:layout_toRightOf="@id/getFin"
+        android:text="Get Diff" />
 
     <TextView
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ref A: "
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/start"
-        tools:layout_editor_absoluteX="0dp" />
+        android:layout_below="@id/getInit"
+        android:text="Ref A: " />
 
 
     <TextView
         android:id="@+id/A"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@+id/textView6"
-        app:layout_constraintTop_toBottomOf="@+id/start" />
+        android:layout_alignBaseline="@id/textView6"
+        android:layout_toRightOf="@id/textView6" />
+
+    <TextView
+        android:id="@+id/fA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/A"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/A" />
+
+    <TextView
+        android:id="@+id/dA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/fA"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/fA" />
+
 
     <TextView
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ref B: "
-        app:layout_constraintStart_toStartOf="@id/textView6"
-        app:layout_constraintTop_toBottomOf="@+id/textView6"
-        tools:layout_editor_absoluteX="0dp" />
+        android:layout_below="@id/textView6"
+        android:text="Ref B: " />
 
     <TextView
         android:id="@+id/B"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/textView7"
-        app:layout_constraintTop_toBottomOf="@+id/textView6"
-        tools:layout_editor_absoluteX="16dp" />
+        android:layout_alignBaseline="@id/textView7"
+        android:layout_toRightOf="@id/textView7" />
+
+    <TextView
+        android:id="@+id/fB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/B"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/A" />
+
+
+    <TextView
+        android:id="@+id/dB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/fB"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/fB" />
+
 
     <TextView
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ref C: "
-        app:layout_constraintStart_toStartOf="@id/textView7"
-        app:layout_constraintTop_toBottomOf="@+id/textView7"
-        tools:layout_editor_absoluteX="0dp" />
+        android:layout_below="@id/textView7"
+        android:text="Ref C: " />
 
     <TextView
         android:id="@+id/C"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/textView8"
-        app:layout_constraintTop_toBottomOf="@+id/textView7"
-        tools:layout_editor_absoluteX="16dp" />
+        android:layout_alignBaseline="@id/textView8"
+        android:layout_toRightOf="@id/textView8" />
+
+    <TextView
+        android:id="@+id/fC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/C"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/C" />
+
+    <TextView
+        android:id="@+id/dC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/fC"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/fC" />
 
     <TextView
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ref D: "
-        app:layout_constraintStart_toStartOf="@id/textView8"
-        app:layout_constraintTop_toBottomOf="@+id/textView8"
-        tools:layout_editor_absoluteX="0dp" />
+        android:layout_below="@id/textView8"
+        android:text="Ref D: " />
 
 
     <TextView
         android:id="@+id/D"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/textView9"
-        app:layout_constraintTop_toBottomOf="@+id/textView8"
-        tools:layout_editor_absoluteX="16dp" />
+        android:layout_alignBaseline="@id/textView9"
+        android:layout_toRightOf="@id/textView9" />
+
+    <TextView
+        android:id="@+id/fD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/D"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/D" />
+
+    <TextView
+        android:id="@+id/dD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/fD"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/fD" />
 
     <EditText
         android:id="@+id/dist"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/D"
         android:ems="10"
         android:hint="Enter Distance"
-        android:inputType="number"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/D" />
+        android:inputType="number" />
 
     <Button
         android:id="@+id/calc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Calculate RADIUS"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dist" />
+        android:layout_below="@id/dist"
+        android:layout_centerHorizontal="true"
+        android:text="Calculate RADIUS" />
 
     <TextView
         android:id="@+id/radA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/calc" />
+        android:layout_below="@id/calc" />
 
     <TextView
         android:id="@+id/radB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radA" />
+        android:layout_below="@id/radA" />
 
     <TextView
         android:id="@+id/radC"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radB" />
+        android:layout_below="@id/radB" />
 
     <TextView
         android:id="@+id/radD"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radC" />
+        android:layout_below="@id/radC" />
 
     <Button
         android:id="@+id/next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="Next Step"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radD" />
+        android:layout_above="@+id/radD"
+        android:layout_centerHorizontal="true"
+        android:text="Next Step" />
 
     <Button
         android:id="@+id/vLog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View Logs"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp" />
+        android:layout_alignParentBottom="true"
+        android:text="View Logs" />
 
-
-    <!--<TextView-->
-    <!--android:id="@+id/slipA"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:visibility="gone"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/radD" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/slipB"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:visibility="gone"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/slipA" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/slipC"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:visibility="gone"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/slipB" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/slipD"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:visibility="gone"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/slipC" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/slipRat"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:visibility="gone"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/slipD" />-->
-
-    <!--<Button-->
-    <!--android:id="@+id/log"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="Log Data"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/slipRat"-->
-    <!--app:layout_constraintHorizontal_bias="0.344"-->
-    <!--/>-->
-
-    <!--<Button-->
-    <!--android:id="@+id/showL"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="Show Log"-->
-    <!--app:layout_constraintBaseline_toBaselineOf="@id/log"-->
-    <!--app:layout_constraintLeft_toRightOf="@id/log"-->
-    <!--app:layout_constraintHorizontal_bias="0.076" />-->
-
-
-    <!--<ListView-->
-    <!--android:id="@+id/lV"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginRight="8dp"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--android:layout_marginLeft="8dp"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--android:layout_marginTop="8dp"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/D"-->
-    <!--android:layout_marginStart="8dp"-->
-    <!--android:layout_marginEnd="8dp" />-->
-
-
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

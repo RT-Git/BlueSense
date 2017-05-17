@@ -3,64 +3,181 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.ravitripathi.bluesense.slipPerActivity">
+    tools:context="me.ravitripathi.bluesense.MainActivity">
 
-    <TextView
-        android:id="@+id/rA"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
-
-    <TextView
-        android:id="@+id/rB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rA"/>
-
-    <TextView
-        android:id="@+id/rC"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/rB" />
-
-    <TextView
-        android:id="@+id/rD"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rC"/>
 
     <Button
-        android:id="@+id/start"
+        android:id="@+id/getInit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="90dp"
-        android:layout_marginRight="90dp"
-        android:layout_marginTop="19dp"
-        android:text="Start"
-        android:layout_below="@+id/rD"
-        android:layout_toLeftOf="@+id/stop"
-        android:layout_toStartOf="@+id/stop" />
+        android:layout_alignParentTop="true"
+        android:text="gET iNIT vALUE" />
 
     <Button
-        android:id="@+id/stop"
+        android:id="@+id/getFin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stop"
-        android:layout_marginRight="60dp"
-        android:layout_marginEnd="60dp"
-        android:layout_alignBaseline="@+id/start"
-        android:layout_alignBottom="@+id/start"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignBaseline="@id/getInit"
+        android:layout_toEndOf="@id/getInit"
+        android:layout_toRightOf="@id/getInit"
+        android:text="Get Final Value" />
 
+    <Button
+        android:id="@+id/diff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/getFin"
+        android:layout_toEndOf="@id/getFin"
+        android:layout_toRightOf="@id/getFin"
+        android:text="Get Diff" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/getInit"
+        android:text="Ref A: " />
+
+
+    <TextView
+        android:id="@+id/A"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/textView6"
+        android:layout_toRightOf="@id/textView6" />
+
+    <TextView
+        android:id="@+id/fA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/A"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/A" />
+
+    <TextView
+        android:id="@+id/dA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/fA"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/fA" />
+
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView6"
+        android:text="Ref B: " />
+
+    <TextView
+        android:id="@+id/B"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/textView7"
+        android:layout_toRightOf="@id/textView7" />
+
+    <TextView
+        android:id="@+id/fB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/B"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/A" />
+
+
+    <TextView
+        android:id="@+id/dB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/fB"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/fB" />
+
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView7"
+        android:text="Ref C: " />
+
+    <TextView
+        android:id="@+id/C"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/textView8"
+        android:layout_toRightOf="@id/textView8" />
+
+    <TextView
+        android:id="@+id/fC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/C"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/C" />
+
+    <TextView
+        android:id="@+id/dC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/fC"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/fC" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView8"
+        android:text="Ref D: " />
+
+
+    <TextView
+        android:id="@+id/D"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/textView9"
+        android:layout_toRightOf="@id/textView9" />
+
+    <TextView
+        android:id="@+id/fD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/D"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/D" />
+
+    <TextView
+        android:id="@+id/dD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/fD"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/fD" />
+
+    <EditText
+        android:id="@+id/dist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/D"
+        android:ems="10"
+        android:hint="Enter Distance"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/calc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dist"
+        android:layout_centerHorizontal="true"
+        android:text="Calculate" />
 
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/stop"
+        android:layout_below="@id/calc"
         android:visibility="gone">
 
         <RelativeLayout
@@ -68,83 +185,9 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tA"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="A : " />
-
-            <TextView
-                android:id="@+id/As"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/tA" />
-
-            <TextView
-                android:id="@+id/tB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tA"
-                android:text="B : " />
-
-            <TextView
-                android:id="@+id/Bs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/tB" />
-
-            <TextView
-                android:id="@+id/tC"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tB"
-                android:text="C : " />
-
-            <TextView
-                android:id="@+id/Cs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/tC" />
-
-            <TextView
-                android:id="@+id/tD"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tC"
-                android:text="D : " />
-
-            <TextView
-                android:id="@+id/Ds"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/tD" />
-
-
-            <EditText
-                android:id="@+id/dist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tD"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="26dp"
-                android:ems="10"
-                android:hint="Enter Distance"
-                android:inputType="number" />
-
-            <Button
-                android:id="@+id/calc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/dist"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="19dp"
-                android:text="Calculate" />
-
-
-            <TextView
                 android:id="@+id/slipA"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/calc" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/slipB"
@@ -161,21 +204,26 @@
             <TextView
                 android:id="@+id/slipD"
                 android:layout_width="wrap_content"
-                android:layout_below="@id/slipC"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_below="@id/slipC" />
 
             <TextView
                 android:id="@+id/SLIPRAT"
-                android:layout_below="@id/slipD"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_below="@id/slipD" />
+
+            <TextView
+                android:id="@+id/SLIPRAT2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/SLIPRAT" />
 
             <Button
                 android:id="@+id/log"
-                android:visibility="gone"
-                android:layout_below="@id/SLIPRAT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/SLIPRAT2"
                 android:text="Log Data" />
 
 
@@ -185,5 +233,5 @@
     </ScrollView>
 
 
-
 </RelativeLayout>
+
